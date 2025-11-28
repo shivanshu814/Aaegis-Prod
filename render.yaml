@@ -15,6 +15,7 @@ services:
         value: 4000
       - key: ALLOWED_ORIGINS
         sync: false
+        # Set this manually in Render dashboard to your frontend URL (e.g., https://aaegis-web.onrender.com)
     healthCheckPath: /v1
 
   # Frontend Service (Next.js)
@@ -24,15 +25,12 @@ services:
     region: oregon
     plan: free
     branch: main
-  # Ensure devDependencies (tailwind, postcss, typescript-config workspace packages)
-  # are installed during build on Render where NODE_ENV=production by default.
-  buildCommand: cd apps/web && pnpm install --prod=false && pnpm build
+    buildCommand: cd apps/web && pnpm install --prod=false && pnpm build
     startCommand: cd apps/web && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: aaegis-backend
-          envVarKey: RENDER_EXTERNAL_URL
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false
+        # Set this manually in Render dashboard to your backend URL (e.g., https://aaegis-backend.onrender.com)
+        # The frontend will automatically append /v1 if needed
