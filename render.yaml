@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: cd services/backend && pnpm install && pnpm build
+    buildCommand: pnpm install --prod=false && cd services/backend && pnpm build
     startCommand: cd services/backend && node dist/server/index.js
     envVars:
       - key: NODE_ENV
@@ -25,7 +25,7 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: cd apps/web && pnpm install --prod=false && pnpm build
+    buildCommand: pnpm install --prod=false && cd services/backend && pnpm build && cd ../../apps/web && pnpm build
     startCommand: cd apps/web && pnpm start
     envVars:
       - key: NODE_ENV
