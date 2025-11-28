@@ -12,7 +12,9 @@ import {
 } from "../utils/cors";
 
 // Port to run the server on
-const port = process.env.PORT ? parseInt(process.env.PORT) : 4000;
+// Render's internal health-check can target port 10000, so default to 10000
+// when PORT is not provided by the environment.
+const port = process.env.PORT ? parseInt(process.env.PORT) : 10000;
 
 // Create tRPC HTTP handler
 const tRPCHandler = createHTTPHandler({
