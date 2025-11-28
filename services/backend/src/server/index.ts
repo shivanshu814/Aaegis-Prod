@@ -35,6 +35,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Quick HTTP health-check for Render's internal probe.
+  // Render's internal health-check hits :10000/v1 with a GET; respond 200 JSON.
+  if (req.url && req.method === "GET" && (req.url === "/v1" || req.url === "/v1/")) {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ status: "ok", message: "health check" }));
+    return;
+  }
+
   // Handle tRPC requests
   if (req.url && req.url.startsWith("/v1")) {
     req.url = req.url.replace(/^\/v1/, "") || "/";
