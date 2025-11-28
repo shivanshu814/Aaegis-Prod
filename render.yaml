@@ -12,7 +12,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 4000
+        value: 10000
       - key: ALLOWED_ORIGINS
         sync: false
     healthCheckPath: /v1
@@ -24,7 +24,9 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: cd apps/web && pnpm install && pnpm build
+  # Ensure devDependencies (tailwind, postcss, typescript-config workspace packages)
+  # are installed during build on Render where NODE_ENV=production by default.
+  buildCommand: cd apps/web && pnpm install --prod=false && pnpm build
     startCommand: cd apps/web && pnpm start
     envVars:
       - key: NODE_ENV
