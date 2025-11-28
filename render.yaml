@@ -1,0 +1,36 @@
+services:
+  # Backend Service (tRPC API)
+  - type: web
+    name: aaegis-backend
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: cd services/backend && pnpm install && pnpm build
+    startCommand: cd services/backend && node dist/server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: ALLOWED_ORIGINS
+        sync: false
+    healthCheckPath: /v1
+
+  # Frontend Service (Next.js)
+  - type: web
+    name: aaegis-web
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: cd apps/web && pnpm install && pnpm build
+    startCommand: cd apps/web && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: aaegis-backend
+          envVarKey: RENDER_EXTERNAL_URL
