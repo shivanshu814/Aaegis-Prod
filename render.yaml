@@ -17,20 +17,20 @@ services:
         sync: false
     healthCheckPath: /v1
 
-  # # Frontend Service (Next.js)
-  # - type: web
-  #   name: aaegis-web
-  #   runtime: node
-  #   region: oregon
-  #   plan: free
-  #   branch: main
-  #   buildCommand: cd apps/web && pnpm install && pnpm build
-  #   startCommand: cd apps/web && pnpm start
-  #   envVars:
-  #     - key: NODE_ENV
-  #       value: production
-  #     - key: NEXT_PUBLIC_API_URL
-  #       fromService:
-  #         type: web
-  #         name: aaegis-backend
-  #         envVarKey: RENDER_EXTERNAL_URL
+  # Frontend Service (Next.js)
+  - type: web
+    name: aaegis-web
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: cd apps/web && pnpm install && pnpm build
+    startCommand: cd apps/web && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: aaegis-backend
+          envVarKey: RENDER_EXTERNAL_URL
