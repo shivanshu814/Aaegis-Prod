@@ -162,6 +162,9 @@ importers:
       '@trpc/server':
         specifier: ^10.45.2
         version: 10.45.2
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.19.25
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -178,12 +181,6 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
     devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      '@types/node':
-        specifier: ^20.11.0
-        version: 20.19.25
       tsx:
         specifier: ^4.20.6
         version: 4.20.6
