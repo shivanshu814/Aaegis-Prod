@@ -1,9 +1,17 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink } from "@trpc/client";
-import React, { useState } from "react";
 import { trpc } from "./trpc";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import { AegisProvider } from "./aegis-sdk";
+import { httpBatchLink } from "@trpc/client";
+import { clusterApiUrl } from "@solana/web3.js";
+import React, { useState, useMemo } from "react";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Export providers
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -21,9 +29,24 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     });
   });
 
+  // You can also provide a custom RPC endpoint.
+  const endpoint = useMemo(() => clusterApiUrl("devnet"), []);
+
+  const wallets = useMemo(() => [], []);
+
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </trpc.Provider>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <AegisProvider>
+            <trpc.Provider client={trpcClient} queryClient={queryClient}>
+              <QueryClientProvider client={queryClient}>
+                {children}
+              </QueryClientProvider>
+            </trpc.Provider>
+          </AegisProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }

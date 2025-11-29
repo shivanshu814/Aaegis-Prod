@@ -6,8 +6,8 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: pnpm install --prod=false && cd services/backend && pnpm build
-    startCommand: cd services/backend && node dist/server/index.js
+    buildCommand: pnpm install --prod=false && pnpm turbo run build --filter=@aegis/backend...
+    startCommand: cd services/backend && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -15,7 +15,6 @@ services:
         value: 4000
       - key: ALLOWED_ORIGINS
         sync: false
-        # Set this manually in Render dashboard to your frontend URL (e.g., https://aaegis-web.onrender.com)
     healthCheckPath: /v1
 
   # Frontend Service (Next.js)
@@ -25,12 +24,10 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: pnpm install --prod=false && cd services/backend && pnpm build && cd ../../apps/web && pnpm build
+    buildCommand: pnpm install --prod=false && pnpm turbo run build --filter=@aaegis/web...
     startCommand: cd apps/web && pnpm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_BACKEND_URL
         sync: false
-        # Set this manually in Render dashboard to your backend URL (e.g., https://aaegis-backend.onrender.com)
-        # The frontend will automatically append /v1 if needed
