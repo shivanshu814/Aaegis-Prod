@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useHealthQuery } from "./hooks/health/useHealthQuery";
 import { useHealthMutation } from "./hooks/health/useHealthMutation";
+import SdkDemo from "./components/SdkDemo";
 
 export default function Home() {
   const [mutationResult, setMutationResult] = useState<string | null>(null);
@@ -231,6 +232,11 @@ export default function Home() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* SDK Demo Section */}
+          <div className='w-full'>
+            <SdkDemo />
           </div>
 
           {/* Status Footer */}

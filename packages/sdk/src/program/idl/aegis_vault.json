@@ -1,0 +1,75 @@
+{
+  "address": "8nj2vusE752EDbTE8mWJZ2qQsPohrrkBpwqKgMxJysyw",
+  "metadata": {
+    "name": "aegis_vault",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "aegis vault"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "message_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "MessageAccount",
+      "discriminator": [
+        97,
+        144,
+        24,
+        58,
+        225,
+        40,
+        89,
+        223
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "MessageAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "message",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "@aegis/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ESNext"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
