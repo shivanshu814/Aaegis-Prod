@@ -1,12 +1,17 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import { logger } from "../utils";
+
+// ESM-compatible __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get environment from args
 const env = process.argv[2];
 if (!env) {
-  logger.error("Usage: ts-node scripts/deploy.ts <environment>");
+  logger.error("Usage: tsx scripts/deploy.ts <environment>");
   logger.info("Environments: localnet, devnet, mainnet");
   process.exit(1);
 }
@@ -27,7 +32,7 @@ logger.info("🔨 Building program...");
 runCommand("anchor build");
 
 // Deploy the program
-logger.info(`fw Deploying program to ${env}...`);
+logger.info(`🚀 Deploying program to ${env}...`);
 runCommand(`anchor deploy --provider.cluster ${env}`);
 
 // Define paths

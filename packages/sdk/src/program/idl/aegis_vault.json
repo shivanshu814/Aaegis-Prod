@@ -1,5 +1,5 @@
 {
-  "address": "8nj2vusE752EDbTE8mWJZ2qQsPohrrkBpwqKgMxJysyw",
+  "address": "71Wb7tohP36AHMxCoBaSL2osriCnNuxgdRNLyM9FZRu8",
   "metadata": {
     "name": "aegis_vault",
     "version": "0.1.0",
@@ -8,25 +8,132 @@
   },
   "instructions": [
     {
-      "name": "initialize",
+      "name": "add_role",
       "discriminator": [
-        175,
-        175,
-        109,
-        31,
-        13,
-        152,
-        155,
-        237
+        45,
+        20,
+        52,
+        132,
+        56,
+        24,
+        179,
+        37
       ],
       "accounts": [
         {
-          "name": "message_account",
+          "name": "protocol_state",
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
         },
         {
-          "name": "user",
+          "name": "admin_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        },
+        {
+          "name": "target_account"
+        }
+      ],
+      "args": [
+        {
+          "name": "role_type",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_vault_type",
+      "discriminator": [
+        189,
+        181,
+        162,
+        156,
+        111,
+        162,
+        38,
+        254
+      ],
+      "accounts": [
+        {
+          "name": "vault_type",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  45,
+                  116,
+                  121,
+                  112,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "collateral_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
           "writable": true,
           "signer": true
         },
@@ -37,36 +144,2085 @@
       ],
       "args": [
         {
-          "name": "message",
-          "type": "string"
+          "name": "collateral_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "CreateVaultTypeParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit_collateral",
+      "discriminator": [
+        156,
+        131,
+        142,
+        116,
+        146,
+        247,
+        162,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type",
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "protocol_state"
+        },
+        {
+          "name": "user_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oracle_price_account"
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "get_latest_price",
+      "discriminator": [
+        195,
+        49,
+        189,
+        171,
+        219,
+        140,
+        79,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "oracle_price_account"
+        }
+      ],
+      "args": [],
+      "returns": "u64"
+    },
+    {
+      "name": "initialize_protocol",
+      "discriminator": [
+        188,
+        233,
+        252,
+        106,
+        134,
+        146,
+        202,
+        91
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "treasury_pubkey",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "liquidate_position",
+      "discriminator": [
+        187,
+        74,
+        229,
+        149,
+        102,
+        81,
+        221,
+        68
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "position.owner",
+                "account": "Position"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type",
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "protocol_state",
+          "writable": true
+        },
+        {
+          "name": "stablecoin_mint",
+          "writable": true
+        },
+        {
+          "name": "liquidator_stablecoin_account",
+          "writable": true
+        },
+        {
+          "name": "liquidator_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oracle_price_account"
+        },
+        {
+          "name": "liquidator",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "repay_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "mint_stablecoin",
+      "discriminator": [
+        196,
+        235,
+        215,
+        70,
+        211,
+        5,
+        214,
+        238
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type",
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "protocol_state",
+          "writable": true
+        },
+        {
+          "name": "stablecoin_mint",
+          "writable": true
+        },
+        {
+          "name": "user_stablecoin_account",
+          "writable": true
+        },
+        {
+          "name": "mint_authority"
+        },
+        {
+          "name": "oracle_price_account"
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "open_position",
+      "discriminator": [
+        135,
+        128,
+        47,
+        77,
+        15,
+        152,
+        240,
+        49
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type"
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_role",
+      "discriminator": [
+        74,
+        69,
+        168,
+        163,
+        248,
+        3,
+        130,
+        0
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "role_type",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "repay_stablecoin",
+      "discriminator": [
+        111,
+        17,
+        16,
+        248,
+        213,
+        201,
+        133,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type",
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "protocol_state",
+          "writable": true
+        },
+        {
+          "name": "stablecoin_mint",
+          "writable": true
+        },
+        {
+          "name": "user_stablecoin_account",
+          "writable": true
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_collateral_ratio_bps",
+      "discriminator": [
+        143,
+        179,
+        226,
+        207,
+        4,
+        137,
+        191,
+        9
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_collateral_ratio_bps",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_default_vault_debt_ceiling",
+      "discriminator": [
+        213,
+        250,
+        103,
+        148,
+        29,
+        220,
+        240,
+        81
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_ceiling",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_global_debt_ceiling",
+      "discriminator": [
+        23,
+        14,
+        56,
+        201,
+        136,
+        38,
+        72,
+        19
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_global_debt_ceiling",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_liquidation_penalty_bps",
+      "discriminator": [
+        79,
+        20,
+        67,
+        76,
+        67,
+        122,
+        64,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_liquidation_penalty_bps",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_liquidation_threshold_bps",
+      "discriminator": [
+        240,
+        171,
+        134,
+        1,
+        231,
+        151,
+        240,
+        201
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_liquidation_threshold_bps",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_mint_fee_bps",
+      "discriminator": [
+        75,
+        255,
+        91,
+        143,
+        214,
+        189,
+        40,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_mint_fee_bps",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "set_oracle_ttl_seconds",
+      "discriminator": [
+        78,
+        147,
+        211,
+        13,
+        178,
+        215,
+        149,
+        179
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_ttl_seconds",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "set_redeem_fee_bps",
+      "discriminator": [
+        11,
+        181,
+        246,
+        199,
+        69,
+        139,
+        87,
+        153
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_redeem_fee_bps",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "set_stability_fee_bps",
+      "discriminator": [
+        115,
+        202,
+        86,
+        19,
+        8,
+        114,
+        237,
+        145
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_stability_fee_bps",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "set_stablecoin_mint",
+      "discriminator": [
+        147,
+        26,
+        168,
+        171,
+        29,
+        135,
+        26,
+        92
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "stablecoin_mint",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "toggle_vault_active",
+      "discriminator": [
+        158,
+        40,
+        6,
+        178,
+        102,
+        199,
+        254,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "vault_type",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  45,
+                  116,
+                  121,
+                  112,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault_type.collateral_mint",
+                "account": "VaultType"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_feature_flags",
+      "discriminator": [
+        139,
+        88,
+        184,
+        214,
+        40,
+        6,
+        55,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "guardian_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "UpdateFeatureFlagsParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_oracle_authority",
+      "discriminator": [
+        69,
+        65,
+        130,
+        209,
+        32,
+        196,
+        23,
+        43
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_treasury",
+      "discriminator": [
+        60,
+        16,
+        243,
+        66,
+        96,
+        59,
+        254,
+        131
+      ],
+      "accounts": [
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "governance_pubkey",
+          "signer": true,
+          "relations": [
+            "protocol_state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_treasury",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_vault_type",
+      "discriminator": [
+        143,
+        242,
+        47,
+        136,
+        79,
+        121,
+        83,
+        103
+      ],
+      "accounts": [
+        {
+          "name": "vault_type",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  45,
+                  116,
+                  121,
+                  112,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault_type.collateral_mint",
+                "account": "VaultType"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "UpdateVaultTypeParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "withdraw_collateral",
+      "discriminator": [
+        115,
+        135,
+        168,
+        106,
+        139,
+        214,
+        138,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_type",
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "protocol_state"
+        },
+        {
+          "name": "user_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_collateral_account",
+          "writable": true
+        },
+        {
+          "name": "vault_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "vault_type"
+              }
+            ]
+          }
+        },
+        {
+          "name": "oracle_price_account"
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     }
   ],
   "accounts": [
     {
-      "name": "MessageAccount",
+      "name": "Position",
       "discriminator": [
-        97,
-        144,
-        24,
-        58,
-        225,
-        40,
-        89,
-        223
+        170,
+        188,
+        143,
+        228,
+        122,
+        64,
+        247,
+        208
       ]
+    },
+    {
+      "name": "ProtocolState",
+      "discriminator": [
+        33,
+        51,
+        173,
+        134,
+        35,
+        140,
+        195,
+        248
+      ]
+    },
+    {
+      "name": "VaultType",
+      "discriminator": [
+        251,
+        71,
+        249,
+        103,
+        117,
+        71,
+        62,
+        101
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidFee",
+      "msg": "Fee must be less than or equal to 100% (10000 basis points)."
+    },
+    {
+      "code": 6002,
+      "name": "MathOverflow",
+      "msg": "Math operation overflow."
+    },
+    {
+      "code": 6003,
+      "name": "ProtocolPaused",
+      "msg": "Protocol is currently paused."
+    },
+    {
+      "code": 6004,
+      "name": "ProtocolShutdown",
+      "msg": "Protocol is shutdown."
+    },
+    {
+      "code": 6005,
+      "name": "OracleStale",
+      "msg": "Oracle price is stale or invalid."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount specified."
+    },
+    {
+      "code": 6007,
+      "name": "ExceedsLTV",
+      "msg": "Exceeds LTV ratio limit."
+    },
+    {
+      "code": 6008,
+      "name": "ExceedsDebtCeiling",
+      "msg": "Exceeds debt ceiling."
+    },
+    {
+      "code": 6009,
+      "name": "PositionHealthy",
+      "msg": "Position is healthy and cannot be liquidated."
+    },
+    {
+      "code": 6010,
+      "name": "InsufficientCollateral",
+      "msg": "Insufficient collateral in position."
     }
   ],
   "types": [
     {
-      "name": "MessageAccount",
+      "name": "CreateVaultTypeParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "message",
-            "type": "string"
+            "name": "oracle_price_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "ltv_bps",
+            "type": "u64"
+          },
+          {
+            "name": "liq_threshold_bps",
+            "type": "u64"
+          },
+          {
+            "name": "liq_penalty_bps",
+            "type": "u64"
+          },
+          {
+            "name": "stability_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "mint_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "redeem_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "vault_debt_ceiling",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "docs": [
+              "Owner of this position"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_type",
+            "docs": [
+              "Vault type this position belongs to"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "collateral_amount",
+            "docs": [
+              "Amount of collateral deposited (in collateral token decimals)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "debt_amount",
+            "docs": [
+              "Amount of stablecoin debt (in 6 decimals)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "Timestamp when position was created"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "docs": [
+              "Timestamp when position was last updated"
+            ],
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "governance_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "guardian_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "oracle_update_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_ata",
+            "type": "pubkey"
+          },
+          {
+            "name": "stablecoin_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint_authority_bump",
+            "type": "u8"
+          },
+          {
+            "name": "base_collateral_ratio_bps",
+            "type": "u64"
+          },
+          {
+            "name": "base_liquidation_threshold_bps",
+            "type": "u64"
+          },
+          {
+            "name": "base_liquidation_penalty_bps",
+            "type": "u64"
+          },
+          {
+            "name": "base_stability_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "base_mint_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "base_redeem_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "oracle_ttl_seconds",
+            "type": "i64"
+          },
+          {
+            "name": "global_debt_ceiling",
+            "type": "u64"
+          },
+          {
+            "name": "default_vault_debt_ceiling",
+            "type": "u64"
+          },
+          {
+            "name": "is_protocol_paused",
+            "type": "bool"
+          },
+          {
+            "name": "is_mint_paused",
+            "type": "bool"
+          },
+          {
+            "name": "is_redeem_paused",
+            "type": "bool"
+          },
+          {
+            "name": "is_shutdown",
+            "type": "bool"
+          },
+          {
+            "name": "total_protocol_debt",
+            "type": "u64"
+          },
+          {
+            "name": "total_protocol_collateral_value",
+            "type": "u64"
+          },
+          {
+            "name": "config_version",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateFeatureFlagsParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "is_protocol_paused",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "is_mint_paused",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "is_redeem_paused",
+            "type": {
+              "option": "bool"
+            }
+          },
+          {
+            "name": "is_shutdown",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateVaultTypeParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "oracle_price_account",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "ltv_bps",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "liq_threshold_bps",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "liq_penalty_bps",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "stability_fee_bps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "mint_fee_bps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "redeem_fee_bps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "vault_debt_ceiling",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultType",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "vault_type_id",
+            "type": "u32"
+          },
+          {
+            "name": "collateral_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "oracle_price_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "ltv_bps",
+            "type": "u64"
+          },
+          {
+            "name": "liq_threshold_bps",
+            "type": "u64"
+          },
+          {
+            "name": "liq_penalty_bps",
+            "type": "u64"
+          },
+          {
+            "name": "stability_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "mint_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "redeem_fee_bps",
+            "type": "u16"
+          },
+          {
+            "name": "vault_debt_ceiling",
+            "type": "u64"
+          },
+          {
+            "name": "vault_authority_bump",
+            "type": "u8"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                96
+              ]
+            }
           }
         ]
       }

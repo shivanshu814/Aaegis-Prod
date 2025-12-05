@@ -7,18 +7,24 @@
     "build": "tsup",
     "dev": "tsx watch src/server/index.ts",
     "start": "node dist/server/index.js",
+    "indexer": "tsx src/indexer/index.ts",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@aegis/sdk": "workspace:*",
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4",
     "@trpc/client": "^10.45.0",
     "@trpc/react-query": "^10.45.0",
     "@trpc/server": "^10.45.2",
+    "@types/node": "^20.11.0",
     "dotenv": "^17.2.3",
-    "winston": "^3.18.3",
-    "zod": "^3.22.4",
+    "mongoose": "^9.0.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "@types/node": "^20.11.0"
+    "winston": "^3.18.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "tsx": "^4.20.6"

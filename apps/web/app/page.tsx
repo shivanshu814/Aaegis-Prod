@@ -1,295 +1,162 @@
 "use client";
 
-import { useState } from "react";
-import { useHealthQuery } from "./hooks/health/useHealthQuery";
-import { useHealthMutation } from "./hooks/health/useHealthMutation";
-import SdkDemo from "./components/SdkDemo";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Link from "next/link";
 
-export default function Home() {
-  const [mutationResult, setMutationResult] = useState<string | null>(null);
-
-  // tRPC Query
-  const hello = useHealthQuery();
-
-  // tRPC Mutation
-  const mutation = useHealthMutation((data: unknown) => {
-    setMutationResult(JSON.stringify(data, null, 2));
-  });
-
-  // Handle mutation
-  const handleMutation = () => {
-    mutation.mutate({ message: "Hello from Frontend!" });
-  };
+export default function HomePage() {
+  const wallet = useAnchorWallet();
 
   return (
-    <div className='min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900'>
-      {/* Animated Background Gradients */}
-      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
-        <div className='absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
-        <div className='absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000'></div>
-        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000'></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
+      {/* Navigation */}
+      <nav className="border-b border-white/10 backdrop-blur-xl bg-black/20">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-8">
+              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                AEGIS
+              </Link>
+              <div className="hidden md:flex gap-6">
+                <Link href="/vaults" className="text-gray-300 hover:text-white transition-colors">
+                  Vaults
+                </Link>
+                {wallet && (
+                  <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                    Dashboard
+                  </Link>
+                )}
+              </div>
+            </div>
+            <WalletMultiButton />
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Gradient Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 py-32">
+          <div className="text-center space-y-8">
+            <h1 className="text-6xl md:text-7xl font-bold">
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+                Decentralized Stablecoin
+              </span>
+              <br />
+              <span className="text-white">Backed by Your Assets</span>
+            </h1>
+            
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Mint AUSD stablecoins by depositing collateral. Transparent, secure, and decentralized on Solana.
+            </p>
+
+            <div className="flex gap-4 justify-center pt-4">
+              <Link 
+                href="/vaults"
+                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-semibold text-white shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/60 transition-all hover:-translate-y-0.5"
+              >
+                Open Vault
+              </Link>
+              <Link 
+                href="/dashboard"
+                className="px-8 py-4 bg-white/10 backdrop-blur-xl rounded-xl font-semibold text-white border border-white/20 hover:bg-white/20 transition-all hover:-translate-y-0.5"
+              >
+                View Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <div className='relative z-10 min-h-screen flex flex-col items-center justify-center gap-8 p-8'>
-        <main className='flex flex-col gap-8 items-center w-full max-w-4xl'>
-          {/* Header */}
-          <div className='text-center space-y-4 mb-8'>
-            <h1 className='text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient'>
-              tRPC Testing Suite
-            </h1>
-            <p className='text-gray-400 text-lg'>
-              Real-time API testing with modern design
+      {/* Features Grid */}
+      <div className="max-w-7xl mx-auto px-6 py-24">
+        <h2 className="text-4xl font-bold text-center mb-16 text-white">
+          Why Choose Aegis?
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 backdrop-blur-xl">
+            <div className="w-14 h-14 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-6 text-3xl">
+              ⚡
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Lightning Fast</h3>
+            <p className="text-gray-400">
+              Built on Solana for instant transactions and minimal fees. Mint and redeem in seconds.
             </p>
           </div>
 
-          <div className='grid md:grid-cols-2 gap-6 w-full'>
-            {/* Query Section */}
-            <div className='group relative'>
-              {/* Glow Effect */}
-              <div className='absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500'></div>
-
-              <div className='relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-[1.02]'>
-                <div className='flex items-center gap-3 mb-6'>
-                  <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/50'>
-                    <svg
-                      className='w-6 h-6 text-white'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className='text-2xl font-bold text-white'>Query</h2>
-                    <p className='text-sm text-gray-400'>GET Request</p>
-                  </div>
-                </div>
-
-                {/* Response Display */}
-                <div className='bg-black/40 backdrop-blur-sm border border-white/5 rounded-xl p-4 mb-6 min-h-[180px] overflow-auto'>
-                  {hello.isLoading ? (
-                    <div className='flex items-center justify-center h-full'>
-                      <div className='relative'>
-                        <div className='w-12 h-12 rounded-full border-4 border-cyan-500/20 border-t-cyan-500 animate-spin'></div>
-                        <div className='absolute inset-0 flex items-center justify-center'>
-                          <div className='w-8 h-8 rounded-full bg-cyan-500/20 animate-pulse'></div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : hello.error ? (
-                    <div className='flex items-start gap-3'>
-                      <div className='w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5'>
-                        <svg
-                          className='w-4 h-4 text-red-400'
-                          fill='none'
-                          stroke='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M6 18L18 6M6 6l12 12'
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className='text-red-400 font-semibold'>Error</p>
-                        <p className='text-red-300/80 text-sm mt-1'>
-                          {hello.error.message}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <pre className='text-sm text-cyan-300 font-mono leading-relaxed'>
-                      {JSON.stringify(hello.data, null, 2)}
-                    </pre>
-                  )}
-                </div>
-
-                {/* Action Button */}
-                <button
-                  onClick={() => hello.refetch()}
-                  className='w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2'
-                >
-                  <svg
-                    className='w-5 h-5'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
-                    />
-                  </svg>
-                  Refetch Query
-                </button>
-              </div>
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 backdrop-blur-xl">
+            <div className="w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center mb-6 text-3xl">
+              🔒
             </div>
-
-            {/* Mutation Section */}
-            <div className='group relative'>
-              {/* Glow Effect */}
-              <div className='absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500'></div>
-
-              <div className='relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]'>
-                <div className='flex items-center gap-3 mb-6'>
-                  <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/50'>
-                    <svg
-                      className='w-6 h-6 text-white'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12'
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className='text-2xl font-bold text-white'>Mutation</h2>
-                    <p className='text-sm text-gray-400'>POST Request</p>
-                  </div>
-                </div>
-
-                {/* Response Display */}
-                <div className='bg-black/40 backdrop-blur-sm border border-white/5 rounded-xl p-4 mb-6 min-h-[180px] overflow-auto'>
-                  {mutation.isPending ? (
-                    <div className='flex items-center justify-center h-full'>
-                      <div className='relative'>
-                        <div className='w-12 h-12 rounded-full border-4 border-purple-500/20 border-t-purple-500 animate-spin'></div>
-                        <div className='absolute inset-0 flex items-center justify-center'>
-                          <div className='w-8 h-8 rounded-full bg-purple-500/20 animate-pulse'></div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : mutationResult ? (
-                    <pre className='text-sm text-purple-300 font-mono leading-relaxed'>
-                      {mutationResult}
-                    </pre>
-                  ) : (
-                    <div className='flex items-center justify-center h-full'>
-                      <div className='text-center'>
-                        <div className='w-16 h-16 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center'>
-                          <svg
-                            className='w-8 h-8 text-gray-500'
-                            fill='none'
-                            stroke='currentColor'
-                            viewBox='0 0 24 24'
-                          >
-                            <path
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              strokeWidth={2}
-                              d='M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4'
-                            />
-                          </svg>
-                        </div>
-                        <p className='text-gray-500 text-sm'>
-                          No mutation result yet
-                        </p>
-                        <p className='text-gray-600 text-xs mt-1'>
-                          Click below to run
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Button */}
-                <button
-                  onClick={handleMutation}
-                  disabled={mutation.isPending}
-                  className='w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2'
-                >
-                  <svg
-                    className='w-5 h-5'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M13 10V3L4 14h7v7l9-11h-7z'
-                    />
-                  </svg>
-                  Run Mutation
-                </button>
-              </div>
-            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Fully Secure</h3>
+            <p className="text-gray-400">
+              Audited smart contracts and over-collateralized positions ensure your assets are always safe.
+            </p>
           </div>
 
-          {/* SDK Demo Section */}
-          <div className='w-full'>
-            <SdkDemo />
-          </div>
-
-          {/* Status Footer */}
-          <div className='mt-8 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 w-full'>
-            <div className='flex items-center justify-between text-sm'>
-              <div className='flex items-center gap-2'>
-                <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse'></div>
-                <span className='text-gray-400'>API Connected</span>
-              </div>
-              <div className='text-gray-500'>tRPC v10 • TanStack Query</div>
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 backdrop-blur-xl">
+            <div className="w-14 h-14 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-6 text-3xl">
+              📊
             </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Transparent</h3>
+            <p className="text-gray-400">
+              Real-time oracle prices and on-chain verification. Full transparency in every transaction.
+            </p>
           </div>
-        </main>
+        </div>
       </div>
 
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        @keyframes gradient {
-          0%,
-          100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
+      {/* Stats Section */}
+      <div className="border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+                150%
+              </div>
+              <div className="text-gray-400">Min Collateral Ratio</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-2">
+                0.1%
+              </div>
+              <div className="text-gray-400">Minting Fee</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                $1.00
+              </div>
+              <div className="text-gray-400">AUSD Peg</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                24/7
+              </div>
+              <div className="text-gray-400">Always Available</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 mt-24">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex justify-between items-center text-sm text-gray-500">
+            <div>© 2024 Aegis Protocol. Built on Solana.</div>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-gray-300 transition-colors">Docs</a>
+              <a href="#" className="hover:text-gray-300 transition-colors">GitHub</a>
+              <a href="#" className="hover:text-gray-300 transition-colors">Discord</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
