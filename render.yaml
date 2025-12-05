@@ -31,3 +31,36 @@ services:
         value: production
       - key: NEXT_PUBLIC_BACKEND_URL
         sync: false
+
+  # Guardian Service (Web)
+  - type: web
+    name: aaegis-guardian
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pnpm install --prod=false && pnpm turbo run build --filter=@aegis/guardian...
+    startCommand: cd services/guardian && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4001
+      - key: MONGODB_URI
+        sync: false
+    healthCheckPath: /health
+
+  # Admin Service (Next.js)
+  - type: web
+    name: aaegis-admin
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pnpm install --prod=false && pnpm turbo run build --filter=@aaegis/admin...
+    startCommand: cd apps/admin && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false

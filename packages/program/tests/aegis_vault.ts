@@ -1,36 +1,65 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
+import { expect } from "chai";
 import { AegisVault } from "../target/types/aegis_vault";
-import { logger } from "../utils/logger";
 
 describe("aegis_vault", () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.AnchorProvider.env());
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
   const program = anchor.workspace.AegisVault as Program<AegisVault>;
 
-  it("Is initialized!", async () => {
-    // Create a new keypair to store the message account
-    const messageKeypair = anchor.web3.Keypair.generate();
-    const message = "Hello from test";
+  const admin = provider.wallet;
+  const treasury = anchor.web3.Keypair.generate();
 
-    // Call initialize with the message and create the account on-chain
-    const tx = await program.methods
-      .initialize(message)
+  const [protocolStatePda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("protocol_state")],
+    program.programId
+  );
+
+  it("Is initialized with defaults!", async () => {
+    await program.methods
+      .initializeProtocol(treasury.publicKey)
       .accounts({
-        messageAccount: messageKeypair.publicKey,
-        user: (program.provider as anchor.AnchorProvider).wallet.publicKey,
+        admin: admin.publicKey,
       })
-      .signers([messageKeypair])
       .rpc();
 
-    logger.info(`Your transaction signature: ${tx}`);
+    const protocolState = await program.account.protocolState.fetch(protocolStatePda);
 
-    // Fetch the account and verify the stored message
-    const stored = await program.account.messageAccount.fetch(
-      messageKeypair.publicKey
-    );
-    logger.info(`Stored message: ${stored.message}`);
-    if (stored.message !== message) throw new Error("message mismatch");
+    // Verify authorities - all should default to admin except treasury
+    expect(protocolState.adminPubkey.toBase58()).to.equal(admin.publicKey.toBase58());
+    expect(protocolState.governancePubkey.toBase58()).to.equal(admin.publicKey.toBase58());
+    expect(protocolState.guardianPubkey.toBase58()).to.equal(admin.publicKey.toBase58());
+    expect(protocolState.oracleUpdateAuthority.toBase58()).to.equal(admin.publicKey.toBase58());
+    expect(protocolState.treasuryPubkey.toBase58()).to.equal(treasury.publicKey.toBase58());
+
+    // Verify default risk params
+    expect(protocolState.baseCollateralRatioBps.toNumber()).to.equal(15000); // 150%
+    expect(protocolState.baseLiquidationThresholdBps.toNumber()).to.equal(13000); // 130%
+    expect(protocolState.baseLiquidationPenaltyBps.toNumber()).to.equal(1000); // 10%
+    expect(protocolState.baseStabilityFeeBps).to.equal(0); // 0%
+    expect(protocolState.baseMintFeeBps).to.equal(0); // 0%
+    expect(protocolState.baseRedeemFeeBps).to.equal(0); // 0%
+
+    // Verify default supply limits
+    expect(protocolState.globalDebtCeiling.toNumber()).to.equal(1_000_000_000_000);
+    expect(protocolState.defaultVaultDebtCeiling.toNumber()).to.equal(10_000_000_000);
+
+    // Verify emergency controls
+    expect(protocolState.isProtocolPaused).to.be.false;
+    expect(protocolState.isMintPaused).to.be.false;
+    expect(protocolState.isRedeemPaused).to.be.false;
+    expect(protocolState.isShutdown).to.be.false;
+
+    // Verify metrics
+    expect(protocolState.totalProtocolDebt.toNumber()).to.equal(0);
+    expect(protocolState.totalProtocolCollateralValue.toNumber()).to.equal(0);
+
+    // Verify metadata
+    expect(protocolState.configVersion.toNumber()).to.equal(1);
+    expect(protocolState.createdAt.toNumber()).to.be.greaterThan(0);
+    expect(protocolState.updatedAt.toNumber()).to.be.greaterThan(0);
   });
 });

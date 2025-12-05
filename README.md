@@ -1,135 +1,261 @@
-# Turborepo starter
+# 🏦 Aegis Protocol - Decentralized Stablecoin on Solana
 
-This Turborepo starter is maintained by the Turborepo core team.
+A fully decentralized, over-collateralized stablecoin protocol built on Solana. Mint **AGSUSD** by depositing collateral and manage your positions through an intuitive interface.
 
-## Using this example
+![Aegis Protocol](https://avatars.githubusercontent.com/u/235737903?s=200&v=4)
 
-Run the following command:
+## 🌟 Features
 
-```sh
-npx create-turbo@latest
+### Core Protocol
+- ✅ **Over-Collateralized Positions** - Secure your debt with crypto collateral
+- ✅ **Multi-Collateral Support** - Multiple vault types for different assets
+- ✅ **Oracle Price Feeds** - Real-time Pyth oracle integration
+- ✅ **Liquidation System** - Automated liquidations with penalties
+- ✅ **Risk Parameters** - Customizable LTV ratios and thresholds
+- ✅ **Emergency Controls** - Pause, shutdown, and safety mechanisms
+
+### User Features
+- 💎 **Open Positions** - Create vaults for any supported collateral
+- 💵 **Deposit Collateral** - Lock assets to secure borrowing power
+- 🏦 **Mint AGSUSD** - Borrow stablecoins up to your LTV limit
+- 💰 **Repay Debt** - Burn AGSUSD to reduce your position
+- 🔓 **Withdraw Collateral** - Remove assets while maintaining health
+- 📊 **Dashboard** - Monitor all positions in real-time
+
+### Admin Tools
+- ⚙️ **Protocol Management** - Global parameters and feature flags
+- 🏛️ **Vault Configuration** - Create and manage collateral types
+- 🔮 **Oracle Management** - Update price feeds and authorities
+- 💵 **Token Creation** - Setup AGSUSD and AGS tokens
+- 👥 **Role Management** - Assign governance and guardian roles
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- pnpm
+- Solana CLI
+- Anchor Framework
+- Rust toolchain
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/your-org/aegis-protocol
+cd aegis-protocol
+
+# Install dependencies
+pnpm install
+
+# Build program
+cd packages/program
+anchor build
+
+# Build SDK
+cd ../sdk
+pnpm build
 ```
 
-## What's inside?
+### Deploy to Devnet
 
-This Turborepo includes the following packages/apps:
+```bash
+# Deploy program
+cd packages/program
+anchor deploy --provider.cluster devnet
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@aegis/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@aegis/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# Run admin app
+cd ../../apps/admin
+pnpm dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### Initialize Protocol
+
+1. Navigate to `http://localhost:3000/admin/tokens`
+2. Create AGSUSD stablecoin mint
+3. Go to `/admin/initialize`
+4. Fill in protocol parameters with AGSUSD mint
+5. Transfer mint authority to protocol PDA
+
+## 📁 Project Structure
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+aegis-protocol/
+├── packages/
+│   ├── program/          # Solana smart contract
+│   │   └── programs/
+│   │       └── aegis_vault/
+│   │           ├── src/
+│   │           │   ├── instructions/  # Program instructions
+│   │           │   ├── state/        # Account structures
+│   │           │   ├── errors/       # Error codes
+│   │           │   └── utils/        # Helper functions
+│   │           └── tests/
+│   └── sdk/              # TypeScript SDK
+│       ├── src/
+│       │   ├── base-client.ts    # Main client
+│       │   └── program/          # Generated IDL/types
+│       ├── scripts/              # Utility scripts
+│       └── metadata/             # Token metadata
+├── apps/
+│   ├── admin/            # Admin dashboard
+│   │   └── app/
+│   │       └── admin/
+│   │           ├── initialize/   # Protocol setup
+│   │           ├── vaults/       # Vault management
+│   │           ├── protocol/     # Global controls
+│   │           ├── positions/    # Position testing
+│   │           └── tokens/       # Token creation
+│   └── web/              # User-facing app
+│       └── app/
+│           ├── page.tsx          # Landing page
+│           ├── vaults/           # Browse vaults
+│           ├── vault/[id]/       # Vault details
+│           └── dashboard/        # User dashboard
+├── services/
+│   ├── backend/          # tRPC API + Indexer
+│   │   ├── src/
+│   │   │   ├── server/          # HTTP server
+│   │   │   ├── router/          # tRPC routers
+│   │   │   ├── models/          # MongoDB models
+│   │   │   ├── indexer/         # Data indexer
+│   │   │   └── db.ts
+│   │   └── package.json
+│   └── guardian/         # Liquidation engine
+│       ├── src/
+│       │   ├── index.ts         # Main service
+│       │   ├── notifications.ts  # Discord webhooks
+│       │   └── db.ts
+│       └── package.json
+└── docs/                 # Documentation
 ```
 
-### Develop
+## 🎯 Core Concepts
 
-To develop all apps and packages, run the following command:
+### Positions
+Users open **positions** by:
+1. Selecting a collateral type (vault)
+2. Depositing collateral
+3. Borrowing AGSUSD up to their LTV limit
+4. Managing debt and collateral
 
+### Vaults
+Each **vault type** has:
+- Collateral mint (e.g., SOL, wBTC)
+- Oracle price feed
+- Risk parameters (LTV, liquidation threshold, penalty)
+- Debt ceiling
+
+### Liquidations
+Positions become liquidatable when:
+- Current LTV > Liquidation Threshold
+- Liquidators repay debt and receive collateral + penalty
+
+## 🔧 Key Instructions
+
+### Protocol Management
+- `initialize_protocol` - One-time setup
+- `add_role` / `remove_role` - Manage authorities
+- `update_feature_flags` - Emergency controls
+
+### Vault Management
+- `create_vault_type` - Add new collateral type
+- `update_vault_type` - Modify parameters
+- `toggle_vault_active` - Enable/disable
+
+### Position Management
+- `open_position` - Initialize user position
+- `deposit_collateral` - Add collateral
+- `mint_stablecoin` - Borrow AGSUSD
+- `repay_stablecoin` - Reduce debt
+- `withdraw_collateral` - Remove collateral
+- `liquidate_position` - Liquidate unhealthy position
+
+## 🎨 Tokens
+
+### AGSUSD (Stablecoin)
+- **Symbol**: AGSUSD
+- **Decimals**: 6
+- **Peg**: $1.00 USD
+- **Backed**: Over-collateralized positions
+- **Mint Authority**: Protocol PDA
+
+### AGS (Governance)
+- **Symbol**: AGS
+- **Decimals**: 9
+- **Purpose**: Governance & utility
+- **Mint Authority**: Admin wallet
+
+See [TOKEN_SETUP.md](./TOKEN_SETUP.md) for detailed setup instructions.
+
+## 📊 Default Parameters
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Base LTV | 150% (15000 bps) | Max borrow ratio |
+| Liq. Threshold | 130% (13000 bps) | Liquidation trigger |
+| Liq. Penalty | 10% (1000 bps) | Liquidator bonus |
+| Stability Fee | 0% | Annual interest |
+| Mint Fee | 0% | One-time minting fee |
+| Redeem Fee | 0% | Redemption fee |
+
+## 🔐 Security
+
+- ✅ Over-collateralization required
+- ✅ Oracle price validation with TTL
+- ✅ Emergency pause mechanisms
+- ✅ Role-based access control
+- ✅ Liquidation incentives
+
+## 🛠️ Development
+
+### Run Tests
+```bash
+cd packages/program
+anchor test
 ```
-cd my-turborepo
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+### Local Validator
+```bash
+solana-test-validator
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+### Generate IDL
+```bash
+anchor build
+cp target/idl/aegis_vault.json packages/sdk/src/program/idl.json
 ```
 
-### Remote Caching
+## 📖 Documentation
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Token Setup](./TOKEN_SETUP.md)
+- [API Reference](./docs/API.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🤝 Contributing
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-```
-cd my-turborepo
+## 📄 License
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+Apache 2.0
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+## 🔗 Links
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+- **Website**: https://aaegis-web.onrender.com
+- **Docs**: Coming soon
+- **Discord**: Coming soon
+- **Twitter**: Coming soon
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## ⚠️ Disclaimer
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+This is experimental software. Use at your own risk. Not audited for production use.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+---
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Built with ❤️ on Solana using Anchor Framework

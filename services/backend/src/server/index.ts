@@ -1,15 +1,19 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import http from "http";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
-import { logger } from "../utils/logger";
+import http from "http";
+import { connectDB } from "../db";
 import { appRouter } from "../router";
 import {
-  setCorsHeaders,
-  handleCorsPreFlight,
   getAllowedOrigins,
+  handleCorsPreFlight,
+  setCorsHeaders,
 } from "../utils/cors";
+import { logger } from "../utils/logger";
+
+// Connect to MongoDB
+connectDB();
 
 // Port to run the server on
 // Render's internal health-check can target port 10000, so default to 10000
