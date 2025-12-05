@@ -5,6 +5,7 @@ import { PublicKey } from "@solana/web3.js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAegis } from "../../providers/aegis-sdk";
 
 export default function VaultsPage() {
@@ -28,6 +29,7 @@ export default function VaultsPage() {
       fetchPrices(vaults);
     } catch (e) {
       console.error(e);
+      toast.error("Failed to fetch vaults");
     } finally {
       setLoading(false);
     }
@@ -36,7 +38,7 @@ export default function VaultsPage() {
   const fetchPrices = async (vaults: any[]) => {
     if (!client) return;
     const newPrices: Record<string, number> = {};
-    
+
     for (const vault of vaults) {
       try {
         const price = await client.getOraclePrice(vault.account.oraclePriceAccount);
@@ -52,29 +54,31 @@ export default function VaultsPage() {
 
   const handleToggleActive = async (collateralMint: PublicKey) => {
     if (!client || !wallet) return;
+    const toastId = toast.loading("Toggling vault status...");
     try {
       await client.toggleVaultActive(collateralMint);
       await fetchVaults();
+      toast.success("Vault status updated", { id: toastId });
     } catch (e) {
       console.error(e);
-      alert("Error toggling vault status");
+      toast.error("Error toggling vault status", { id: toastId });
     }
   };
 
   return (
     <div className="p-8 text-white max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+        <h1 className="text-3xl font-bold gradient-text">
           Manage Vault Types
         </h1>
-        <Link 
+        <Link
           href="/admin/vaults/create"
           className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold transition-all"
         >
           + Create New Vault
         </Link>
       </div>
-      
+
       {loading ? (
         <div className="text-center py-12 text-gray-400">Loading vaults...</div>
       ) : vaults.length === 0 ? (
@@ -98,9 +102,8 @@ export default function VaultsPage() {
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    vault.account.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-                  }`}>
+                  <div className={`px-3 py-1 rounded-full text-xs font-bold ${vault.account.isActive ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                    }`}>
                     {vault.account.isActive ? "ACTIVE" : "INACTIVE"}
                   </div>
                   {prices[vault.publicKey.toString()] !== undefined && (
@@ -131,24 +134,23 @@ export default function VaultsPage() {
               </div>
 
               <div className="flex gap-3 border-t border-white/5 pt-4">
-                <button 
+                <button
                   onClick={() => handleToggleActive(vault.account.collateralMint)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    vault.account.isActive 
-                      ? "bg-red-500/10 text-red-400 hover:bg-red-500/20" 
-                      : "bg-green-500/10 text-green-400 hover:bg-green-500/20"
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${vault.account.isActive
+                    ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                    : "bg-green-500/10 text-green-400 hover:bg-green-500/20"
+                    }`}
                 >
                   {vault.account.isActive ? "Pause / Disable" : "Resume / Enable"}
                 </button>
-                
+
                 {/* Update button could open a modal or navigate to an edit page. For now, placeholder. */}
-                  <button
-                    className="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all"
-                    onClick={() => router.push(`/admin/vaults/update?mint=${vault.account.collateralMint.toString()}`)}
-                  >
-                    Update Configuration
-                  </button>
+                <button
+                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all"
+                  onClick={() => router.push(`/admin/vaults/update?mint=${vault.account.collateralMint.toString()}`)}
+                >
+                  Update Configuration
+                </button>
               </div>
             </div>
           ))}

@@ -3,6 +3,7 @@
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAegis } from "../../providers/aegis-sdk";
 
 export default function PositionsPage() {
@@ -44,8 +45,7 @@ export default function PositionsPage() {
     try {
       const pos = await client.fetchPosition(new PublicKey(selectedVault));
       setPosition(pos);
-    } catch (e) {
-      console.log("Position not found");
+    } catch {
       setPosition(null);
     }
   };
@@ -53,13 +53,14 @@ export default function PositionsPage() {
   const handleOpenPosition = async () => {
     if (!client || !selectedVault || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Opening position...");
     try {
       const tx = await client.openPosition(new PublicKey(selectedVault));
-      alert(`Position Opened! TX: ${tx}`);
+      toast.success(`Position Opened! TX: ${tx}`, { id: toastId });
       await fetchPosition();
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -68,6 +69,7 @@ export default function PositionsPage() {
   const handleDeposit = async () => {
     if (!client || !selectedVault || !amount || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Depositing collateral...");
     try {
       const vaultData = vaultTypes.find(v => v.publicKey.toString() === selectedVault);
       if (!vaultData) throw new Error("Vault not found");
@@ -77,12 +79,12 @@ export default function PositionsPage() {
         parseFloat(amount) * 1_000_000, // Convert to 6 decimals
         vaultData.account.collateralMint
       );
-      alert(`Deposited! TX: ${tx}`);
+      toast.success(`Deposited! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -91,17 +93,18 @@ export default function PositionsPage() {
   const handleMint = async () => {
     if (!client || !selectedVault || !amount || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Minting stablecoin...");
     try {
       const tx = await client.mintStablecoin(
         new PublicKey(selectedVault),
         parseFloat(amount) * 1_000_000 // Convert to 6 decimals
       );
-      alert(`Minted! TX: ${tx}`);
+      toast.success(`Minted! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -110,17 +113,18 @@ export default function PositionsPage() {
   const handleRepay = async () => {
     if (!client || !selectedVault || !amount || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Repaying stablecoin...");
     try {
       const tx = await client.repayStablecoin(
         new PublicKey(selectedVault),
         parseFloat(amount) * 1_000_000
       );
-      alert(`Repaid! TX: ${tx}`);
+      toast.success(`Repaid! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -129,6 +133,7 @@ export default function PositionsPage() {
   const handleWithdraw = async () => {
     if (!client || !selectedVault || !amount || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Withdrawing collateral...");
     try {
       const vaultData = vaultTypes.find(v => v.publicKey.toString() === selectedVault);
       if (!vaultData) throw new Error("Vault not found");
@@ -138,12 +143,12 @@ export default function PositionsPage() {
         parseFloat(amount) * 1_000_000,
         vaultData.account.collateralMint
       );
-      alert(`Withdrew! TX: ${tx}`);
+      toast.success(`Withdrew! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -159,12 +164,12 @@ export default function PositionsPage() {
 
   return (
     <div className="p-8 text-white max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+      <h1 className="text-4xl font-bold mb-8 gradient-text">
         My Positions
       </h1>
 
       {/* Vault Selector */}
-      <div className="mb-8 bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="mb-8 glass border border-white/10 rounded-2xl p-6">
         <label className="block text-sm font-medium mb-2 text-gray-400">Select Vault Type</label>
         <select
           value={selectedVault}
@@ -191,12 +196,12 @@ export default function PositionsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-400">Debt</p>
-                <p className="text-2xl font-bold">{(position.debtAmount / 1_000_000).toFixed(6)} AUSD</p>
+                <p className="text-2xl font-bold">{(position.debtAmount / 1_000_000).toFixed(6)} AGSUSD</p>
               </div>
               <div>
                 <p className="text-sm text-gray-400">Health Factor</p>
                 <p className="text-xl font-bold text-green-400">
-                  {position.collateralAmount > 0 
+                  {position.collateralAmount > 0
                     ? ((position.collateralAmount / Math.max(position.debtAmount, 1)) * 100).toFixed(2)
                     : "∞"}%
                 </p>
@@ -208,7 +213,7 @@ export default function PositionsPage() {
               <button
                 onClick={handleOpenPosition}
                 disabled={loading}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition-all disabled:opacity-50"
+                className="px-6 py-3 btn-gradient rounded-xl font-bold transition-all disabled:opacity-50"
               >
                 {loading ? "Opening..." : "Open Position"}
               </button>
@@ -217,7 +222,7 @@ export default function PositionsPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="glass border border-white/10 rounded-2xl p-6">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-4">
             <input
@@ -261,7 +266,7 @@ export default function PositionsPage() {
         </div>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="glass border border-white/10 rounded-2xl p-6">
         <h3 className="text-lg font-semibold mb-4">Notes</h3>
         <ul className="list-disc list-inside space-y-2 text-sm text-gray-400">
           <li>Open a position first before depositing collateral</li>

@@ -12,8 +12,8 @@ import {
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
-import base58 from "bs58";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function TokensPage() {
   const { connection } = useConnection();
@@ -24,11 +24,12 @@ export default function TokensPage() {
 
   const handleCreateStablecoin = async () => {
     if (!wallet.publicKey || !connection) {
-      alert("Please connect your wallet");
+      toast.error("Please connect your wallet");
       return;
     }
 
     setLoading(true);
+    const toastId = toast.loading("Creating AGSUSD Mint...");
     try {
       // Generate a new keypair for the mint
       const mintKeypair = Keypair.generate();
@@ -63,13 +64,15 @@ export default function TokensPage() {
 
       const mintAddress = mintKeypair.publicKey.toString();
       setStablecoinMint(mintAddress);
-      alert(`AGSUSD Mint Created!\n\nMint Address: ${mintAddress}\n\n⚠️ Important: Transfer mint authority to protocol PDA after initialization!`);
+      toast.success("AGSUSD Mint Created!", { id: toastId });
+      toast.info(`Mint Address: ${mintAddress}`, { duration: 10000 });
+      toast.warning("⚠️ Important: Transfer mint authority to protocol PDA after initialization!", { duration: 10000 });
 
       // Save to localStorage for convenience
       localStorage.setItem("agsusd_mint", mintAddress);
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -77,11 +80,12 @@ export default function TokensPage() {
 
   const handleCreateGovernance = async () => {
     if (!wallet.publicKey || !connection) {
-      alert("Please connect your wallet");
+      toast.error("Please connect your wallet");
       return;
     }
 
     setLoading(true);
+    const toastId = toast.loading("Creating AGS Governance Token...");
     try {
       // Generate a new keypair for the mint
       const mintKeypair = Keypair.generate();
@@ -116,13 +120,14 @@ export default function TokensPage() {
 
       const mintAddress = mintKeypair.publicKey.toString();
       setGovernanceMint(mintAddress);
-      alert(`AGS Governance Token Created!\n\nMint Address: ${mintAddress}`);
+      toast.success("AGS Governance Token Created!", { id: toastId });
+      toast.info(`Mint Address: ${mintAddress}`, { duration: 10000 });
 
       // Save to localStorage
       localStorage.setItem("ags_mint", mintAddress);
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -130,11 +135,12 @@ export default function TokensPage() {
 
   const handleAddMetadata = async (mintAddress: string, name: string, symbol: string, uri: string) => {
     if (!wallet.publicKey || !connection) {
-      alert("Please connect your wallet");
+      toast.error("Please connect your wallet");
       return;
     }
 
     setLoading(true);
+    const toastId = toast.loading("Adding Metadata...");
     try {
       // Initialize Umi
       const umi = createUmi(connection.rpcEndpoint)
@@ -161,10 +167,10 @@ export default function TokensPage() {
         collectionDetails: null,
       }).sendAndConfirm(umi);
 
-      alert(`Metadata added successfully!\nSignature: ${base58.encode(signature)}`);
+      toast.success("Metadata added successfully!", { id: toastId });
     } catch (e: any) {
       console.error(e);
-      alert(`Error adding metadata: ${e.message}`);
+      toast.error(`Error adding metadata: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -172,13 +178,13 @@ export default function TokensPage() {
 
   return (
     <div className="p-8 text-white max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600">
+      <h1 className="text-4xl font-bold mb-8 gradient-text">
         Token Management
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Stablecoin Section */}
-        <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-2xl p-8">
+        <div className="glass border border-cyan-500/20 rounded-2xl p-8">
           <div className="text-5xl mb-4">💵</div>
           <h2 className="text-3xl font-bold mb-4">AGSUSD Stablecoin</h2>
           <p className="text-gray-400 mb-6">USD-pegged stablecoin for the Aegis Protocol</p>
@@ -209,7 +215,7 @@ export default function TokensPage() {
             <button
               onClick={handleCreateStablecoin}
               disabled={loading || !wallet.publicKey || !!stablecoinMint}
-              className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-white shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 btn-gradient rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Processing..." : stablecoinMint ? "Mint Created" : "Create AGSUSD Mint"}
             </button>
@@ -218,7 +224,7 @@ export default function TokensPage() {
               <button
                 onClick={() => handleAddMetadata(
                   stablecoinMint,
-                  "AGS USD",
+                  "AGSUSD",
                   "AGSUSD",
                   "https://raw.githubusercontent.com/Aageis-Finance/aaegis-token-metadata/refs/heads/main/token-metadata.json"
                 )}
@@ -232,7 +238,7 @@ export default function TokensPage() {
         </div>
 
         {/* Governance Token Section */}
-        <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8">
+        <div className="glass border border-purple-500/20 rounded-2xl p-8">
           <div className="text-5xl mb-4">🏛️</div>
           <h2 className="text-3xl font-bold mb-4">AGS Governance</h2>
           <p className="text-gray-400 mb-6">Governance & utility token for Aaegis Protocol</p>
@@ -263,7 +269,7 @@ export default function TokensPage() {
             <button
               onClick={handleCreateGovernance}
               disabled={loading || !wallet.publicKey || !!governanceMint}
-              className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl font-bold text-white shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 btn-gradient rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Processing..." : governanceMint ? "Mint Created" : "Create AGS Token"}
             </button>
@@ -287,7 +293,7 @@ export default function TokensPage() {
       </div>
 
       {/* Instructions */}
-      <div className="mt-12 p-8 rounded-2xl bg-white/5 border border-white/10">
+      <div className="mt-12 p-8 rounded-2xl glass border border-white/10">
         <h3 className="text-2xl font-bold mb-6">Setup Instructions</h3>
         <ol className="space-y-4 text-gray-300">
           <li className="flex gap-4">
@@ -326,27 +332,26 @@ export default function TokensPage() {
             </div>
           </li>
         </ol>
-      </div>
-
-      {/* Metadata Info */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-6 rounded-2xl bg-cyan-500/5 border border-cyan-500/20">
-          <h4 className="font-bold text-cyan-400 mb-3">AGSUSD Metadata</h4>
-          <div className="text-sm space-y-2 text-gray-300">
-            <p><span className="text-gray-500">Name:</span> AGS USD</p>
-            <p><span className="text-gray-500">Symbol:</span> AGSUSD</p>
-            <p><span className="text-gray-500">Description:</span> USD-pegged stablecoin of the Aaegis Protocol on Solana.</p>
-            <p className="text-xs break-all"><span className="text-gray-500">Image:</span> https://avatars.githubusercontent.com/u/235737903?s=200...</p>
+        {/* Metadata Info */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 rounded-2xl bg-cyan-500/5 border border-cyan-500/20">
+            <h4 className="font-bold text-cyan-400 mb-3">AGSUSD Metadata</h4>
+            <div className="text-sm space-y-2 text-gray-300">
+              <p><span className="text-gray-500">Name:</span> AGSUSD</p>
+              <p><span className="text-gray-500">Symbol:</span> AGSUSD</p>
+              <p><span className="text-gray-500">Description:</span> USD-pegged stablecoin of the Aaegis Protocol on Solana.</p>
+              <p className="text-xs break-all"><span className="text-gray-500">Image:</span> https://avatars.githubusercontent.com/u/235737903?s=200...</p>
+            </div>
           </div>
-        </div>
 
-        <div className="p-6 rounded-2xl bg-purple-500/5 border border-purple-500/20">
-          <h4 className="font-bold text-purple-400 mb-3">AGS Metadata</h4>
-          <div className="text-sm space-y-2 text-gray-300">
-            <p><span className="text-gray-500">Name:</span> Aaegis Finance</p>
-            <p><span className="text-gray-500">Symbol:</span> AGS</p>
-            <p><span className="text-gray-500">Description:</span> Governance & utility token for the Aaegis Protocol.</p>
-            <p className="text-xs break-all"><span className="text-gray-500">Image:</span> https://avatars.githubusercontent.com/u/235737903?s=200...</p>
+          <div className="p-6 rounded-2xl bg-purple-500/5 border border-purple-500/20">
+            <h4 className="font-bold text-purple-400 mb-3">AGS Metadata</h4>
+            <div className="text-sm space-y-2 text-gray-300">
+              <p><span className="text-gray-500">Name:</span> Aaegis Finance</p>
+              <p><span className="text-gray-500">Symbol:</span> AGS</p>
+              <p><span className="text-gray-500">Description:</span> Governance & utility token for the Aaegis Protocol.</p>
+              <p className="text-xs break-all"><span className="text-gray-500">Image:</span> https://avatars.githubusercontent.com/u/235737903?s=200...</p>
+            </div>
           </div>
         </div>
       </div>

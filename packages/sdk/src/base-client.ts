@@ -1,7 +1,7 @@
 import type { Program } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import { BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from "@solana/spl-token";
+import { createAssociatedTokenAccountInstruction, getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { AegisVaultIdl } from "./program/idl";
 import { AegisVault } from "./program/types";
@@ -671,25 +671,41 @@ export class AegisClient {
       (this.program.provider as any).wallet.publicKey
     );
 
-    const [mintAuthority] = PublicKey.findProgramAddressSync(
-      [Buffer.from("mint_authority")],
+    const mintAuthority = PublicKey.createProgramAddressSync(
+      [Buffer.from("mint_authority"), Buffer.from([protocolState.mintAuthorityBump])],
       this.program.programId
     );
 
-    const tx = await this.program.methods
+    // Check if user stablecoin account exists
+    const userStablecoinAccountInfo = await this.program.provider.connection.getAccountInfo(userStablecoinAccount);
+
+    let builder = this.program.methods
       .mintStablecoin(new BN(amount))
       .accounts({
         position,
         vaultType,
-        protocolState: this.getProtocolStatePDA(),
+        protocolState: this.getProtocolStatePDA()[0],
         stablecoinMint: protocolState.stablecoinMint,
         userStablecoinAccount,
         mintAuthority,
         oraclePriceAccount: vaultTypeAccount.oraclePriceAccount,
         owner: (this.program.provider as any).wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-      } as any)
-      .rpc();
+      } as any);
+
+    if (!userStablecoinAccountInfo) {
+      console.log("Creating user stablecoin account...");
+      builder = builder.preInstructions([
+        createAssociatedTokenAccountInstruction(
+          (this.program.provider as any).wallet.publicKey, // payer
+          userStablecoinAccount, // associatedToken
+          (this.program.provider as any).wallet.publicKey, // owner
+          protocolState.stablecoinMint // mint
+        )
+      ]);
+    }
+
+    const tx = await builder.rpc();
 
     console.log("Stablecoin minted:", tx);
     return tx;
@@ -869,5 +885,43 @@ export class AegisClient {
       .rpc();
 
     return tx;
+  }
+
+  /**
+   * Get wallet SOL balance in SOL (not lamports)
+   */
+  async getWalletBalance(walletPubkey?: PublicKey): Promise<number> {
+    const wallet = walletPubkey || (this.program.provider as any).wallet.publicKey;
+    const balance = await this.program.provider.connection.getBalance(wallet);
+    return balance / 1_000_000_000; // Convert lamports to SOL
+  }
+
+  /**
+   * Get token balance for a specific mint
+   * @param mint - Token mint address
+   * @param owner - Owner address (defaults to connected wallet)
+   * @param decimals - Token decimals (default 9 for SOL)
+   * @returns Token balance or 0 if account doesn't exist
+   */
+  async getTokenBalance(
+    mint: PublicKey,
+    owner?: PublicKey,
+    decimals: number = 9
+  ): Promise<number> {
+    try {
+      const ownerPubkey = owner || (this.program.provider as any).wallet.publicKey;
+      const ata = await getAssociatedTokenAddress(mint, ownerPubkey);
+      const tokenAccount = await this.program.provider.connection.getAccountInfo(ata);
+
+      if (!tokenAccount) {
+        return 0;
+      }
+
+      // Parse token account data (amount is at bytes 64-72)
+      const amount = tokenAccount.data.readBigUInt64LE(64);
+      return Number(amount) / Math.pow(10, decimals);
+    } catch (e) {
+      return 0;
+    }
   }
 }

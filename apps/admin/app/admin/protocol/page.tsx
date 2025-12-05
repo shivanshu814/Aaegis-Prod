@@ -2,7 +2,7 @@
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "sonner";
 import { useAegis } from "../../providers/aegis-sdk";
 
 
@@ -22,7 +22,7 @@ export default function ProtocolPage() {
       const state = await client.fetchProtocolState();
       setProtocolState(state);
     } catch (e) {
-      console.error(e);
+      console.error("Error fetching protocol state:", e);
       toast.error("Failed to fetch protocol state");
     }
   };
@@ -50,9 +50,8 @@ export default function ProtocolPage() {
 
   return (
     <>
-      <Toaster position="top-right" />
       <div className="p-8 text-white max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+        <h1 className="text-3xl font-bold mb-8 gradient-text">
           Global Protocol Controls
         </h1>
 
@@ -227,12 +226,13 @@ function ConfigInput({ label, value, onUpdate }: { label: string, value: string,
 
   const handleUpdate = async () => {
     setLoading(true);
+    const toastId = toast.loading(`Updating ${label}...`);
     try {
       await onUpdate(val);
-      alert(`${label} updated successfully`);
+      toast.success(`${label} updated successfully`, { id: toastId });
     } catch (e) {
       console.error(e);
-      alert(`Error updating ${label}`);
+      toast.error(`Error updating ${label}`, { id: toastId });
     } finally {
       setLoading(false);
     }

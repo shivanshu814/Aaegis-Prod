@@ -3,6 +3,7 @@
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAegis } from "../../providers/aegis-sdk";
 
 export default function InitializePage() {
@@ -11,7 +12,7 @@ export default function InitializePage() {
   const [loading, setLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [protocolState, setProtocolState] = useState<any>(null);
-  
+
   const [treasury, setTreasury] = useState("");
   const [stablecoinMint, setStablecoinMint] = useState("");
 
@@ -33,23 +34,24 @@ export default function InitializePage() {
   const handleInitialize = async () => {
     if (!client || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Initializing protocol...");
     try {
       let treasuryKey: PublicKey;
       try {
         treasuryKey = new PublicKey(treasury);
       } catch (e) {
-        alert("Invalid Treasury Public Key");
+        toast.error("Invalid Treasury Public Key", { id: toastId });
         return;
       }
 
       const sig = await client.initializeProtocol(treasuryKey);
       console.log("Initialized:", sig);
-      
+
       await checkInitialization();
-      alert("Protocol Initialized Successfully! Now set the stablecoin mint.");
+      toast.success("Protocol Initialized Successfully! Now set the stablecoin mint.", { id: toastId });
     } catch (e) {
       console.error(e);
-      alert("Error initializing protocol");
+      toast.error("Error initializing protocol", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -58,40 +60,41 @@ export default function InitializePage() {
   const handleSetStablecoin = async () => {
     if (!client || !wallet) return;
     setLoading(true);
+    const toastId = toast.loading("Setting stablecoin mint...");
     try {
       let mintKey: PublicKey;
       try {
         mintKey = new PublicKey(stablecoinMint);
       } catch (e) {
-        alert("Invalid Mint Public Key");
+        toast.error("Invalid Mint Public Key", { id: toastId });
         return;
       }
 
       const tx = await client.setStablecoinMint(mintKey);
       console.log("Stablecoin Mint Set:", tx);
-      
+
       await checkInitialization();
-      alert("Stablecoin Mint Set Successfully!");
+      toast.success("Stablecoin Mint Set Successfully!", { id: toastId });
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message}`);
+      toast.error(`Error: ${e.message}`, { id: toastId });
     } finally {
       setLoading(false);
     }
   };
 
-  const isStablecoinSet = protocolState && 
+  const isStablecoinSet = protocolState &&
     protocolState.stablecoinMint.toString() !== "11111111111111111111111111111111";
 
   return (
     <div className="p-8 text-white max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+      <h1 className="text-3xl font-bold mb-8 gradient-text">
         Protocol Setup
       </h1>
-      
+
       <div className="space-y-8">
         {/* Step 1: Initialize */}
-        <div className={`bg-white/5 backdrop-blur-xl border ${isInitialized ? "border-green-500/50" : "border-white/10"} rounded-2xl p-8 shadow-xl transition-all`}>
+        <div className={`glass border ${isInitialized ? "border-green-500/50" : "border-white/10"} rounded-2xl p-8 transition-all`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">1. Initialize Protocol</h2>
             {isInitialized && <span className="text-2xl">✅</span>}
@@ -105,19 +108,19 @@ export default function InitializePage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-300">Treasury Public Key</label>
-                <input 
-                  type="text" 
-                  value={treasury} 
+                <input
+                  type="text"
+                  value={treasury}
                   onChange={e => setTreasury(e.target.value)}
                   placeholder="Enter Treasury Wallet Address"
                   className="w-full p-3 rounded-xl bg-black/20 border border-white/10 focus:border-purple-500 outline-none transition-all font-mono text-sm"
                 />
               </div>
-              
-              <button 
+
+              <button
                 onClick={handleInitialize}
                 disabled={loading || !wallet || !treasury}
-                className="w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20"
+                className="w-full py-3 px-4 rounded-xl font-semibold btn-gradient disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Initializing..." : "Initialize Protocol"}
               </button>
@@ -126,7 +129,7 @@ export default function InitializePage() {
         </div>
 
         {/* Step 2: Set Stablecoin Mint */}
-        <div className={`bg-white/5 backdrop-blur-xl border ${isStablecoinSet ? "border-green-500/50" : "border-white/10"} rounded-2xl p-8 shadow-xl transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : ""}`}>
+        <div className={`glass border ${isStablecoinSet ? "border-green-500/50" : "border-white/10"} rounded-2xl p-8 transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : ""}`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">2. Set Stablecoin Mint</h2>
             {isStablecoinSet && <span className="text-2xl">✅</span>}
@@ -140,9 +143,9 @@ export default function InitializePage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-300">AGSUSD Mint Address</label>
-                <input 
-                  type="text" 
-                  value={stablecoinMint} 
+                <input
+                  type="text"
+                  value={stablecoinMint}
                   onChange={e => setStablecoinMint(e.target.value)}
                   placeholder="Enter AGSUSD Mint Address"
                   className="w-full p-3 rounded-xl bg-black/20 border border-white/10 focus:border-purple-500 outline-none transition-all font-mono text-sm"
@@ -151,11 +154,11 @@ export default function InitializePage() {
                   Create this in the Tokens page first if you haven't already.
                 </p>
               </div>
-              
-              <button 
+
+              <button
                 onClick={handleSetStablecoin}
                 disabled={loading || !wallet || !stablecoinMint}
-                className="w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/20"
+                className="w-full py-3 px-4 rounded-xl font-semibold btn-gradient disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Setting Mint..." : "Set Stablecoin Mint"}
               </button>

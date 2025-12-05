@@ -1,17 +1,19 @@
 "use client";
 
-import { trpc } from "./trpc";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { AegisProvider } from "./aegis-sdk";
-import { httpBatchLink } from "@trpc/client";
-import { clusterApiUrl } from "@solana/web3.js";
-import React, { useState, useMemo } from "react";
-import "@solana/wallet-adapter-react-ui/styles.css";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import { clusterApiUrl } from "@solana/web3.js";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { httpBatchLink } from "@trpc/client";
+import React, { useMemo, useState } from "react";
+import { AegisProvider } from "./aegis-sdk";
+import { trpc } from "./trpc";
+
+import { Toaster } from "sonner";
 
 // Export providers
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -42,6 +44,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <trpc.Provider client={trpcClient} queryClient={queryClient}>
               <QueryClientProvider client={queryClient}>
                 {children}
+                <Toaster position="bottom-right" theme="dark" richColors />
               </QueryClientProvider>
             </trpc.Provider>
           </AegisProvider>
