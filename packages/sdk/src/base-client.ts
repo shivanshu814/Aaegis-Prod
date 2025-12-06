@@ -679,6 +679,12 @@ export class AegisClient {
     // Check if user stablecoin account exists
     const userStablecoinAccountInfo = await this.program.provider.connection.getAccountInfo(userStablecoinAccount);
 
+    const treasuryStablecoinAccount = await getAssociatedTokenAddress(
+      protocolState.stablecoinMint,
+      protocolState.treasuryPubkey,
+      true
+    );
+
     let builder = this.program.methods
       .mintStablecoin(new BN(amount))
       .accounts({
@@ -687,6 +693,7 @@ export class AegisClient {
         protocolState: this.getProtocolStatePDA()[0],
         stablecoinMint: protocolState.stablecoinMint,
         userStablecoinAccount,
+        treasuryStablecoinAccount,
         mintAuthority,
         oraclePriceAccount: vaultTypeAccount.oraclePriceAccount,
         owner: (this.program.provider as any).wallet.publicKey,
@@ -734,6 +741,12 @@ export class AegisClient {
       (this.program.provider as any).wallet.publicKey
     );
 
+    const treasuryStablecoinAccount = await getAssociatedTokenAddress(
+      protocolState.stablecoinMint,
+      protocolState.treasuryPubkey,
+      true
+    );
+
     const tx = await this.program.methods
       .repayStablecoin(new anchor.BN(amount))
       .accounts({
@@ -742,6 +755,7 @@ export class AegisClient {
         protocolState: this.getProtocolStatePDA()[0],
         stablecoinMint: protocolState.stablecoinMint,
         userStablecoinAccount,
+        treasuryStablecoinAccount,
         owner: (this.program.provider as any).wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       } as any)

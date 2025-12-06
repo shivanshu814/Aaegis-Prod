@@ -2,53 +2,68 @@
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAegis } from "../../providers/aegis-sdk";
+
+interface VaultType {
+  publicKey: PublicKey;
+  account: {
+    collateralMint: PublicKey;
+    ltvBps: number;
+  };
+}
+
+interface Position {
+  collateralAmount: number;
+  debtAmount: number;
+}
 
 export default function PositionsPage() {
   const { client } = useAegis();
   const wallet = useAnchorWallet();
-  const [vaultTypes, setVaultTypes] = useState<any[]>([]);
+  const [vaultTypes, setVaultTypes] = useState<VaultType[]>([]);
   const [selectedVault, setSelectedVault] = useState<string>("");
-  const [position, setPosition] = useState<any>(null);
+  const [position, setPosition] = useState<Position | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Form states
   const [amount, setAmount] = useState("");
 
+  const fetchVaultTypes = useCallback(async () => {
+    if (!client) return;
+    try {
+      const vaults = await client.fetchAllVaultTypes();
+      // Cast to Unknown first if the SDK types aren't matching perfectly, 
+      // but assuming the SDK returns compatible objects.
+      setVaultTypes(vaults as unknown as VaultType[]);
+      if (vaults.length > 0 && !selectedVault) {
+        setSelectedVault(vaults[0].publicKey.toString());
+      }
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  }, [client, selectedVault]);
+
   useEffect(() => {
     fetchVaultTypes();
-  }, [client]);
+  }, [fetchVaultTypes]);
+
+  const fetchPosition = useCallback(async () => {
+    if (!client || !selectedVault) return;
+    try {
+      const pos = await client.fetchPosition(new PublicKey(selectedVault));
+      setPosition(pos as Position);
+    } catch {
+      setPosition(null);
+    }
+  }, [client, selectedVault]);
 
   useEffect(() => {
     if (selectedVault) {
       fetchPosition();
     }
-  }, [selectedVault, client]);
-
-  const fetchVaultTypes = async () => {
-    if (!client) return;
-    try {
-      const vaults = await client.fetchAllVaultTypes();
-      setVaultTypes(vaults);
-      if (vaults.length > 0 && !selectedVault) {
-        setSelectedVault(vaults[0].publicKey.toString());
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const fetchPosition = async () => {
-    if (!client || !selectedVault) return;
-    try {
-      const pos = await client.fetchPosition(new PublicKey(selectedVault));
-      setPosition(pos);
-    } catch {
-      setPosition(null);
-    }
-  };
+  }, [selectedVault, fetchPosition]);
 
   const handleOpenPosition = async () => {
     if (!client || !selectedVault || !wallet) return;
@@ -58,9 +73,10 @@ export default function PositionsPage() {
       const tx = await client.openPosition(new PublicKey(selectedVault));
       toast.success(`Position Opened! TX: ${tx}`, { id: toastId });
       await fetchPosition();
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      toast.error(`Error: ${e.message}`, { id: toastId });
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      toast.error(`Error: ${msg}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -82,9 +98,10 @@ export default function PositionsPage() {
       toast.success(`Deposited! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      toast.error(`Error: ${e.message}`, { id: toastId });
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      toast.error(`Error: ${msg}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -102,9 +119,10 @@ export default function PositionsPage() {
       toast.success(`Minted! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      toast.error(`Error: ${e.message}`, { id: toastId });
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      toast.error(`Error: ${msg}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -122,9 +140,10 @@ export default function PositionsPage() {
       toast.success(`Repaid! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      toast.error(`Error: ${e.message}`, { id: toastId });
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      toast.error(`Error: ${msg}`, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -146,9 +165,10 @@ export default function PositionsPage() {
       toast.success(`Withdrew! TX: ${tx}`, { id: toastId });
       await fetchPosition();
       setAmount("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      toast.error(`Error: ${e.message}`, { id: toastId });
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      toast.error(`Error: ${msg}`, { id: toastId });
     } finally {
       setLoading(false);
     }

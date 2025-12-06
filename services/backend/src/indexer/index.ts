@@ -7,8 +7,10 @@ import { Position } from "../models/Position";
 import { ProtocolState } from "../models/ProtocolState";
 import { VaultType } from "../models/VaultType";
 import { logger } from "../utils/logger";
+import { indexRecentTransactions } from "./fee-indexer";
 
 // Use Devnet for now
+
 const CONNECTION_URL = process.env.CONNECTION_URL || "https://api.devnet.solana.com";
 
 export const runIndexer = async () => {
@@ -42,10 +44,23 @@ export const runIndexer = async () => {
                 stablecoinMint: protocolState.stablecoinMint.toBase58(),
                 totalProtocolDebt: protocolState.totalProtocolDebt.toNumber(),
                 globalDebtCeiling: protocolState.globalDebtCeiling.toNumber(),
+                // Fee tracking (from on-chain state)
+                totalMintFeesCollected: protocolState.totalMintFeesCollected?.toNumber() || 0,
+                totalRedeemFeesCollected: protocolState.totalRedeemFeesCollected?.toNumber() || 0,
+                totalLiquidationFeesCollected: protocolState.totalLiquidationFeesCollected?.toNumber() || 0,
+                // Fee configuration
+                baseMintFeeBps: protocolState.baseMintFeeBps || 0,
+                baseRedeemFeeBps: protocolState.baseRedeemFeeBps || 0,
+                baseLiquidationPenaltyBps: protocolState.baseLiquidationPenaltyBps?.toNumber() || 0,
+                baseStabilityFeeBps: protocolState.baseStabilityFeeBps || 0,
+                // Risk configuration
+                baseCollateralRatioBps: protocolState.baseCollateralRatioBps?.toNumber() || 0,
+                baseLiquidationThresholdBps: protocolState.baseLiquidationThresholdBps?.toNumber() || 0,
                 updatedAt: protocolState.updatedAt.toNumber(),
             },
             { upsert: true, new: true }
         );
+
 
         // 2. Index Vault Types
         logger.info("Indexing Vault Types...");
@@ -128,6 +143,10 @@ export const runIndexer = async () => {
             },
             { upsert: true }
         );
+
+        // 5. Index Fee and Liquidation Events from transactions
+        logger.info("Indexing Fee and Liquidation Events...");
+        await indexRecentTransactions(connection, program.programId, 100);
 
         logger.info("Indexing completed successfully.");
 

@@ -16,7 +16,7 @@ export function calculateMaxLTV(
     protocolState: BackendProtocolStateData | null
 ): number {
     const collateralRatioBps = protocolState
-        ? Number(protocolState.collateralRatioBps)
+        ? (Number(protocolState.collateralRatioBps) || 15000)
         : 15000;
     return (10000 / collateralRatioBps) * 100;
 }
@@ -28,7 +28,7 @@ export function calculateLiquidationLTV(
     protocolState: BackendProtocolStateData | null
 ): number {
     const liquidationThresholdBps = protocolState
-        ? Number(protocolState.liquidationThresholdBps)
+        ? (Number(protocolState.liquidationThresholdBps) || 13000)
         : 13000;
     return (10000 / liquidationThresholdBps) * 100;
 }
@@ -53,7 +53,7 @@ export function calculateHealthFactor(
     }
 
     const liquidationThresholdBps = protocolState
-        ? Number(protocolState.liquidationThresholdBps)
+        ? (Number(protocolState.liquidationThresholdBps) || 13000)
         : 13000;
 
     // Convert BPS to percentage (13000 bps = 130) to match collateralRatio which is in %

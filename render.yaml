@@ -16,7 +16,22 @@ services:
       - key: ALLOWED_ORIGINS
         sync: false
       - key: MONGODB_URI
-        value: mongodb+srv://aaegis:AGS2025@aaegis.xvpaqwg.mongodb.net/
+        value: mongodb+srv://aaegis-finance:AGS2025@aaegis-finance.dnkydig.mongodb.net/
+      # Email/SMTP Configuration for Alerts
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        value: shivanshupathak814@gmail.com
+      - key: SMTP_PASS
+        value: ycedcjbresbdfgdj
+      - key: SMTP_FROM
+        value: '"Aegis Protocol" <shivanshupathak814@gmail.com>'
+      - key: ADMIN_EMAIL
+        value: shivanshupathak814@gmail.com
     healthCheckPath: /v1
 
   # Frontend Service (Next.js)
@@ -49,7 +64,22 @@ services:
       - key: PORT
         value: 4001
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://aaegis-finance:AGS2025@aaegis-finance.dnkydig.mongodb.net/
+      # Email/SMTP Configuration
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: SMTP_USER
+        value: shivanshupathak814@gmail.com
+      - key: SMTP_PASS
+        value: ycedcjbresbdfgdj
+      - key: SMTP_FROM
+        value: '"Aegis Protocol" <shivanshupathak814@gmail.com>'
+      - key: ADMIN_EMAIL
+        value: shivanshupathak814@gmail.com
     healthCheckPath: /health
 
   # Admin Service (Next.js)

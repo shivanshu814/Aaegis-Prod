@@ -442,6 +442,13 @@
           "writable": true
         },
         {
+          "name": "treasury_collateral_account",
+          "docs": [
+            "Treasury collateral account to receive protocol's share of penalty"
+          ],
+          "writable": true
+        },
+        {
           "name": "vault_authority",
           "pda": {
             "seeds": [
@@ -549,6 +556,13 @@
         },
         {
           "name": "user_stablecoin_account",
+          "writable": true
+        },
+        {
+          "name": "treasury_stablecoin_account",
+          "docs": [
+            "Treasury stablecoin account to receive fees"
+          ],
           "writable": true
         },
         {
@@ -746,6 +760,13 @@
         },
         {
           "name": "user_stablecoin_account",
+          "writable": true
+        },
+        {
+          "name": "treasury_stablecoin_account",
+          "docs": [
+            "Treasury stablecoin account to receive fees"
+          ],
           "writable": true
         },
         {
@@ -1852,6 +1873,21 @@
       "code": 6010,
       "name": "InsufficientCollateral",
       "msg": "Insufficient collateral in position."
+    },
+    {
+      "code": 6011,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient token balance."
+    },
+    {
+      "code": 6012,
+      "name": "MintPaused",
+      "msg": "Minting is currently paused."
+    },
+    {
+      "code": 6013,
+      "name": "RedeemPaused",
+      "msg": "Redemption is currently paused."
     }
   ],
   "types": [
@@ -2043,6 +2079,18 @@
             "type": "u64"
           },
           {
+            "name": "total_mint_fees_collected",
+            "type": "u64"
+          },
+          {
+            "name": "total_redeem_fees_collected",
+            "type": "u64"
+          },
+          {
+            "name": "total_liquidation_fees_collected",
+            "type": "u64"
+          },
+          {
             "name": "config_version",
             "type": "u64"
           },
@@ -2059,7 +2107,7 @@
             "type": {
               "array": [
                 "u8",
-                64
+                40
               ]
             }
           }
