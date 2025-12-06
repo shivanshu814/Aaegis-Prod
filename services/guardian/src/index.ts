@@ -23,15 +23,72 @@ const Position = mongoose.model("Position", PositionSchema);
 
 const CONNECTION_URL = process.env.CONNECTION_URL || "https://api.devnet.solana.com";
 
-// Guardian Wallet (Liquidator)
-// In production, load from env or secret manager
-const GUARDIAN_KEYPAIR = Keypair.generate(); // Placeholder
+// Load or Generate Guardian Keypair
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = path.join(__dirname, "..", "guardian-keypair.json");
+
+let GUARDIAN_KEYPAIR: Keypair;
+
+if (fs.existsSync(KEYPAIR_PATH)) {
+    const secretKey = Uint8Array.from(JSON.parse(fs.readFileSync(KEYPAIR_PATH, "utf-8")));
+    GUARDIAN_KEYPAIR = Keypair.fromSecretKey(secretKey);
+    logger.info(`Loaded Guardian Wallet via ${KEYPAIR_PATH}`);
+} else {
+    GUARDIAN_KEYPAIR = Keypair.generate();
+    fs.writeFileSync(KEYPAIR_PATH, JSON.stringify(Array.from(GUARDIAN_KEYPAIR.secretKey)));
+    logger.info(`Generated new Guardian Wallet at ${KEYPAIR_PATH}`);
+}
+
+const checkAndFundWallet = async (connection: Connection, publicKey: PublicKey) => {
+    try {
+        const balance = await connection.getBalance(publicKey);
+        logger.info(`Guardian Wallet (${publicKey.toString()}) Balance: ${balance / 1e9} SOL`);
+
+        if (balance < 1 * 1e9) { // Fund if below 1 SOL
+            logger.info("Balance low (< 1 SOL). Requesting airdrop...");
+            try {
+                // Request 2 SOL to be safe
+                const signature = await connection.requestAirdrop(publicKey, 2 * 1e9);
+
+                // Wait for confirmation
+                const latestBlockHash = await connection.getLatestBlockhash();
+                await connection.confirmTransaction({
+                    blockhash: latestBlockHash.blockhash,
+                    lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+                    signature: signature,
+                });
+
+                logger.info("Airdrop successful. New balance will be reflected shortly.");
+            } catch (airdropError: any) {
+                if (airdropError.message && airdropError.message.includes("429")) {
+                    logger.warn("Airdrop rate limited (429). Will retry later.");
+                } else {
+                    logger.warn("Airdrop failed. Ensure wallet is funded manually if on mainnet or if devnet faucet is down.", airdropError);
+                }
+            }
+        }
+    } catch (e) {
+        logger.error("Failed to check balance or airdrop:", e);
+    }
+};
 
 const runGuardian = async () => {
     logger.info("Starting Guardian Service...");
     await connectDB();
 
     const connection = new Connection(CONNECTION_URL, "confirmed");
+
+    // Check Balance on startup
+    await checkAndFundWallet(connection, GUARDIAN_KEYPAIR.publicKey);
+
+    // Schedule Balance Check every 1 hour
+    cron.schedule("0 * * * *", async () => {
+        logger.info("Running scheduled wallet balance check...");
+        await checkAndFundWallet(connection, GUARDIAN_KEYPAIR.publicKey);
+    });
+
     const wallet = new Wallet(GUARDIAN_KEYPAIR);
     const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
     const client = new AegisClient(provider);
