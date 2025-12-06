@@ -26,4 +26,13 @@ pub enum AegisError {
     PositionHealthy,
     #[msg("Insufficient collateral in position.")]
     InsufficientCollateral,
+    #[msg("Insufficient token balance.")]
+    InsufficientBalance,
+
+    // Feature flag errors
+    #[msg("Minting is currently paused.")]
+    MintPaused,
+    #[msg("Redemption is currently paused.")]
+    RedeemPaused,
 }
+

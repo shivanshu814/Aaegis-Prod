@@ -448,6 +448,13 @@ export type AegisVault = {
           "writable": true
         },
         {
+          "name": "treasuryCollateralAccount",
+          "docs": [
+            "Treasury collateral account to receive protocol's share of penalty"
+          ],
+          "writable": true
+        },
+        {
           "name": "vaultAuthority",
           "pda": {
             "seeds": [
@@ -555,6 +562,13 @@ export type AegisVault = {
         },
         {
           "name": "userStablecoinAccount",
+          "writable": true
+        },
+        {
+          "name": "treasuryStablecoinAccount",
+          "docs": [
+            "Treasury stablecoin account to receive fees"
+          ],
           "writable": true
         },
         {
@@ -752,6 +766,13 @@ export type AegisVault = {
         },
         {
           "name": "userStablecoinAccount",
+          "writable": true
+        },
+        {
+          "name": "treasuryStablecoinAccount",
+          "docs": [
+            "Treasury stablecoin account to receive fees"
+          ],
           "writable": true
         },
         {
@@ -1858,6 +1879,21 @@ export type AegisVault = {
       "code": 6010,
       "name": "insufficientCollateral",
       "msg": "Insufficient collateral in position."
+    },
+    {
+      "code": 6011,
+      "name": "insufficientBalance",
+      "msg": "Insufficient token balance."
+    },
+    {
+      "code": 6012,
+      "name": "mintPaused",
+      "msg": "Minting is currently paused."
+    },
+    {
+      "code": 6013,
+      "name": "redeemPaused",
+      "msg": "Redemption is currently paused."
     }
   ],
   "types": [
@@ -2049,6 +2085,18 @@ export type AegisVault = {
             "type": "u64"
           },
           {
+            "name": "totalMintFeesCollected",
+            "type": "u64"
+          },
+          {
+            "name": "totalRedeemFeesCollected",
+            "type": "u64"
+          },
+          {
+            "name": "totalLiquidationFeesCollected",
+            "type": "u64"
+          },
+          {
             "name": "configVersion",
             "type": "u64"
           },
@@ -2065,7 +2113,7 @@ export type AegisVault = {
             "type": {
               "array": [
                 "u8",
-                64
+                40
               ]
             }
           }

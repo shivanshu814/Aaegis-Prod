@@ -37,13 +37,18 @@ pub struct ProtocolState {
     pub total_protocol_debt: u64,
     pub total_protocol_collateral_value: u64,
 
+    // Fee tracking (cumulative)
+    pub total_mint_fees_collected: u64,
+    pub total_redeem_fees_collected: u64,
+    pub total_liquidation_fees_collected: u64,
+
     // Metadata
     pub config_version: u64,
     pub created_at: i64,
     pub updated_at: i64,
 
-    // Reserved bytes
-    pub reserved: [u8; 64],
+    // Reserved bytes (reduced to accommodate new fields)
+    pub reserved: [u8; 40],
 }
 
 impl ProtocolState {
@@ -71,8 +76,12 @@ impl ProtocolState {
         1 + // is_shutdown
         8 + // total_protocol_debt
         8 + // total_protocol_collateral_value
+        8 + // total_mint_fees_collected
+        8 + // total_redeem_fees_collected
+        8 + // total_liquidation_fees_collected
         8 + // config_version
         8 + // created_at
         8 + // updated_at
-        64; // reserved
+        40; // reserved (reduced from 64)
 }
+

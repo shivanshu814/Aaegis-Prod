@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Suspense } from "react";
+import AdminNavbar from "./components/AdminNavbar";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -39,9 +40,15 @@ export default function RootLayout({
             className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(1000px_600px_at_bottom_right,rgba(217,70,239,0.08),transparent_60%)]"
             aria-hidden="true"
           />
-          <Providers>{children}</Providers>
+          <Providers>
+            <AdminNavbar />
+            <main className="min-h-[calc(100vh-4rem)]">
+              {children}
+            </main>
+          </Providers>
         </Suspense>
       </body>
     </html>
   );
 }
+

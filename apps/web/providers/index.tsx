@@ -1,5 +1,6 @@
 "use client";
 
+import UserTrackingWrapper from "@/components/shared/UserTrackingWrapper";
 import { trpc } from "@/providers/query/trpc";
 import { AegisProvider } from "@/providers/wallet/aegis-sdk";
 import {
@@ -41,7 +42,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <AegisProvider>
             <trpc.Provider client={trpcClient} queryClient={queryClient}>
               <QueryClientProvider client={queryClient}>
-                {children}
+                <UserTrackingWrapper>
+                  {children}
+                </UserTrackingWrapper>
               </QueryClientProvider>
             </trpc.Provider>
           </AegisProvider>

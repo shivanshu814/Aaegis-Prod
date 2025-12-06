@@ -160,13 +160,14 @@ const HealthFactor = ({
                 <div className="relative z-10 flex flex-col items-center justify-center">
                   {(normalizedHealthFactor > 0 || totalDebtAGSUSD === 0) && (
                     <span
-                      className={`inline-flex mt-18 mb-3 items-center px-3 py-1 rounded-full text-xs font-semibold ${healthFactorRisk.color}`}
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${healthFactorRisk.color}`}
+                      style={{ marginTop: "75px" }}
                     >
                       {healthFactorRisk.label}
                     </span>
                   )}
                   <div
-                    className={`text-5xl font-bold ${getHealthFactorTextColor()} transition-colors duration-300`}
+                    className={`text-5xl mt-2 font-bold ${getHealthFactorTextColor()} transition-colors duration-300`}
                   >
                     {totalDebtAGSUSD === 0
                       ? "4.00"

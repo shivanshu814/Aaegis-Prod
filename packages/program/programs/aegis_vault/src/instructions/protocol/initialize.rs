@@ -61,13 +61,19 @@ pub fn handler(
     protocol_state.total_protocol_debt = 0;
     protocol_state.total_protocol_collateral_value = 0;
 
+    // Initialize fee tracking (zero by default)
+    protocol_state.total_mint_fees_collected = 0;
+    protocol_state.total_redeem_fees_collected = 0;
+    protocol_state.total_liquidation_fees_collected = 0;
+
     // Set metadata
     protocol_state.config_version = INITIAL_CONFIG_VERSION;
     protocol_state.created_at = clock.unix_timestamp;
     protocol_state.updated_at = clock.unix_timestamp;
 
-    // Initialize reserved bytes to zero
-    protocol_state.reserved = [0u8; RESERVED_BYTES_SIZE];
+    // Initialize reserved bytes to zero (reduced size)
+    protocol_state.reserved = [0u8; 40];
+
 
     msg!("Protocol Initialized with defaults");
     msg!("Admin: {}", protocol_state.admin_pubkey);
